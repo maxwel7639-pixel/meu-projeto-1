@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+agente.log
+processed_ids.json
+leads_backup.json
+.venv/
+venv/
