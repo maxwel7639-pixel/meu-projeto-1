@@ -1,1 +1,1 @@
-web: gunicorn agente:create_web_app() --bind 0.0.0.0:$PORT
+web: gunicorn "agente:create_web_app()" --bind 0.0.0.0:$PORT
