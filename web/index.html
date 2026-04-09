@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Max Arte Digital — CRM de Leads</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --gold: #C9A84C;
+  --gold-light: #e0c06a;
+  --gold-dim: rgba(201,168,76,0.15);
+  --black: #080808;
+  --surface: #111111;
+  --surface2: #1a1a1a;
+  --border: #1e1e1e;
+  --border2: #2a2a2a;
+  --text: #e8e6e0;
+  --muted: #888580;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --info: #2980b9;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--black); color: var(--text); min-height: 100vh; }
+
+/* HEADER */
+header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border2);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 36px; height: 36px; border: 1.5px solid var(--gold); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-icon svg { width: 18px; height: 18px; fill: var(--gold); }
+.logo-text { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--gold); letter-spacing: 0.04em; }
+.logo-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.header-right { display: flex; align-items: center; gap: 16px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 6px var(--success); }
+.status-label { font-size: 12px; color: var(--muted); }
+
+/* NAV */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  gap: 0;
+}
+.nav-btn {
+  background: none; border: none; color: var(--muted);
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+  padding: 14px 20px; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  letter-spacing: 0.02em;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+/* MAIN */
+main { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* STATS GRID */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stat-card:hover { border-color: var(--gold); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--gold); opacity: 0.5;
+}
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--gold); line-height: 1; }
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; }
+
+/* CARD */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th {
+  text-align: left; padding: 10px 14px;
+  font-size: 11px; font-weight: 500;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
+}
+td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+tr:hover td { background: var(--surface2); }
+.td-msg { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.td-user { color: var(--gold); font-weight: 500; }
+
+/* BADGES */
+.badge {
+  display: inline-block; font-size: 10px; font-weight: 500;
+  padding: 3px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.badge-novo     { background: rgba(41,128,185,0.2); color: #7ec8e3; }
+.badge-contatado { background: rgba(201,168,76,0.15); color: var(--gold); }
+.badge-proposta  { background: rgba(142,68,173,0.2); color: #c39bd3; }
+.badge-convertido{ background: rgba(39,174,96,0.2); color: #82e0aa; }
+.badge-descartado{ background: rgba(127,140,141,0.2); color: #aab7b8; }
+
+/* NICHO TAG */
+.nicho-tag {
+  display: inline-block; font-size: 10px;
+  padding: 2px 8px; border-radius: 4px;
+  background: var(--gold-dim); color: var(--gold-light);
+  border: 1px solid rgba(201,168,76,0.2);
+}
+
+/* CONFIDENCE BAR */
+.conf-bar { display: flex; align-items: center; gap: 8px; }
+.conf-track { width: 60px; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+.conf-fill { height: 100%; background: var(--gold); border-radius: 2px; }
+.conf-num { font-size: 11px; color: var(--muted); min-width: 28px; }
+
+/* BUTTONS */
+.btn {
+  background: none; border: 1px solid var(--border2); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  padding: 7px 14px; border-radius: 6px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn-gold { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+.btn-gold:hover { background: rgba(201,168,76,0.25); }
+.btn-danger { border-color: rgba(192,57,43,0.4); color: #e74c3c; }
+.btn-danger:hover { background: rgba(192,57,43,0.1); border-color: #e74c3c; }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* FILTERS */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
+.filter-select {
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  padding: 7px 12px; border-radius: 6px; cursor: pointer;
+  outline: none;
+}
+.filter-select:focus { border-color: var(--gold); }
+.search-input {
+  background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 12px;
+  padding: 7px 14px; border-radius: 6px; outline: none; width: 220px;
+}
+.search-input::placeholder { color: var(--muted); }
+.search-input:focus { border-color: var(--gold); }
+
+/* CHAT */
+.chat-wrap { display: flex; flex-direction: column; height: 460px; }
+.chat-msgs {
+  flex: 1; overflow-y: auto; padding: 16px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 14px; display: flex; flex-direction: column; gap: 12px;
+}
+.chat-msgs::-webkit-scrollbar { width: 4px; }
+.chat-msgs::-webkit-scrollbar-track { background: transparent; }
+.chat-msgs::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.msg-user { align-self: flex-end; background: var(--gold-dim); border: 1px solid rgba(201,168,76,0.3); border-radius: 10px 10px 2px 10px; padding: 10px 14px; max-width: 75%; font-size: 13px; color: var(--text); }
+.msg-agent { align-self: flex-start; background: var(--surface); border: 1px solid var(--border2); border-radius: 10px 10px 10px 2px; padding: 10px 14px; max-width: 80%; font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; }
+.msg-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+.chat-input-row { display: flex; gap: 10px; }
+.chat-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  padding: 10px 16px; border-radius: 8px; outline: none;
+}
+.chat-input::placeholder { color: var(--muted); }
+.chat-input:focus { border-color: var(--gold); }
+.chat-suggestions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.suggestion { font-size: 11px; background: var(--surface2); border: 1px solid var(--border); color: var(--muted); padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+.suggestion:hover { border-color: var(--gold); color: var(--gold); }
+
+/* STATUS REPORT */
+.report-box {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 16px;
+  font-family: 'Inter', monospace; font-size: 12px;
+  color: var(--text); line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 12px; padding: 28px; width: 480px; max-width: 95vw;
+}
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); margin-bottom: 20px; }
+.modal-field { margin-bottom: 14px; }
+.modal-field label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+.modal-field select, .modal-field textarea {
+  width: 100%; background: var(--surface2); border: 1px solid var(--border2);
+  color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px;
+  padding: 8px 12px; border-radius: 6px; outline: none; resize: vertical;
+}
+.modal-field select:focus, .modal-field textarea:focus { border-color: var(--gold); }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* EMPTY STATE */
+.empty { text-align: center; padding: 48px; color: var(--muted); }
+.empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+.empty-text { font-size: 14px; }
+
+/* LOADING */
+.loading-row td { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
+
+/* CONFIG */
+.config-row { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+.config-input {
+  flex: 1; background: var(--surface2); border: 1px solid var(--border2); color: var(--text);
+  font-family: 'Inter', monospace; font-size: 12px;
+  padding: 8px 14px; border-radius: 6px; outline: none;
+}
+.config-input:focus { border-color: var(--gold); }
+.config-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  background: var(--surface); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 12px 18px;
+  font-size: 13px; color: var(--text);
+  transform: translateY(80px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.ok { border-left: 3px solid var(--success); }
+.toast.err { border-left: 3px solid var(--danger); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.loading-dots::after { content: '...'; animation: pulse 1.2s infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <div class="logo-text">Max Arte Digital</div>
+      <div class="logo-sub">CRM de Leads</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot" id="statusDot"></div>
+    <span class="status-label" id="statusLabel">Conectando...</span>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" data-section="dashboard">Dashboard</button>
+  <button class="nav-btn" data-section="leads">Leads</button>
+  <button class="nav-btn" data-section="chat">Chat IA</button>
+  <button class="nav-btn" data-section="config">Configuração</button>
+</nav>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="section active">
+    <div class="stats" id="statsGrid">
+      <div class="stat-card"><div class="stat-num loading-dots">–</div><div class="stat-label">Leads salvos</div></div>
+      <div class="stat-card"><div class="stat-num loading-dots">–</div><div class="stat-label">Em backup</div></div>
+      <div class="stat-card"><div class="stat-num loading-dots">–</div><div class="stat-label">Ignorados</div></div>
+      <div class="stat-card"><div class="stat-num loading-dots">–</div><div class="stat-label">Não qualificados</div></div>
+      <div class="stat-card"><div class="stat-num loading-dots">–</div><div class="stat-label">Erros</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Relatório do dia</div>
+      <div class="report-box" id="reportBox">Carregando<span class="loading-dots"></span></div>
+    </div>
+  </section>
+
+  <!-- LEADS -->
+  <section id="leads" class="section">
+    <div class="card">
+      <div class="card-title">Gerenciamento de Leads</div>
+      <div class="filters">
+        <input class="search-input" id="searchInput" type="text" placeholder="Buscar por nome ou @username..."/>
+        <select class="filter-select" id="filterStatus">
+          <option value="">Todos os status</option>
+          <option value="novo">Novo</option>
+          <option value="contatado">Contatado</option>
+          <option value="proposta">Proposta</option>
+          <option value="convertido">Convertido</option>
+          <option value="descartado">Descartado</option>
+        </select>
+        <select class="filter-select" id="filterNicho">
+          <option value="">Todos os nichos</option>
+        </select>
+        <button class="btn btn-gold" id="refreshBtn">↻ Atualizar</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Lead</th>
+              <th>Mensagem</th>
+              <th>Nicho</th>
+              <th>Confiança IA</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="leadsBody">
+            <tr class="loading-row"><td colspan="7">Carregando leads<span class="loading-dots"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAT -->
+  <section id="chat" class="section">
+    <div class="card">
+      <div class="card-title">Chat com o Agente</div>
+      <div class="chat-suggestions">
+        <span class="suggestion" onclick="askSuggestion(this)">quantos leads hoje?</span>
+        <span class="suggestion" onclick="askSuggestion(this)">status do agente</span>
+        <span class="suggestion" onclick="askSuggestion(this)">leads por nicho</span>
+        <span class="suggestion" onclick="askSuggestion(this)">resumo do dia</span>
+      </div>
+      <div class="chat-wrap">
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="msg-agent">
+            <div class="msg-label">Agente</div>
+            Olá! Sou o agente da Max Arte Digital. Pergunte sobre leads, status ou resumo do dia.
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" type="text" placeholder="Ex: quantos leads novos hoje?"/>
+          <button class="btn btn-gold" id="sendBtn">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONFIG -->
+  <section id="config" class="section">
+    <div class="card">
+      <div class="card-title">URL do Backend</div>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.6;">
+        Se o agente Python estiver rodando localmente, deixe em branco.<br>
+        Para produção (Railway, Render, VPS), cole a URL do servidor aqui.
+      </p>
+      <div class="config-row">
+        <span class="config-label">Backend URL</span>
+        <input class="config-input" id="apiUrl" type="text" placeholder="http://localhost:5000 ou https://seu-app.railway.app"/>
+        <button class="btn btn-gold" onclick="saveConfig()">Salvar</button>
+      </div>
+      <div style="margin-top:20px;">
+        <div class="card-title" style="font-size:14px;">Testar conexão</div>
+        <button class="btn" onclick="testConnection()" style="margin-top:8px;">Testar agora</button>
+        <div id="testResult" style="margin-top:12px; font-size:12px; color:var(--muted);"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Comandos úteis</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="background:var(--surface2); border-radius:6px; padding:12px 16px; font-family:monospace; font-size:12px; color:var(--gold); border:1px solid var(--border);">python agente.py --test</div>
+        <div style="background:var(--surface2); border-radius:6px; padding:12px 16px; font-family:monospace; font-size:12px; color:var(--gold); border:1px solid var(--border);">python agente.py --web</div>
+        <div style="background:var(--surface2); border-radius:6px; padding:12px 16px; font-family:monospace; font-size:12px; color:var(--gold); border:1px solid var(--border);">python agente.py --loop --interval 300</div>
+        <div style="background:var(--surface2); border-radius:6px; padding:12px 16px; font-family:monospace; font-size:12px; color:var(--gold); border:1px solid var(--border);">python agente.py --sync-backup</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL EDITAR LEAD -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">Editar Lead</div>
+    <input type="hidden" id="editLeadId"/>
+    <div class="modal-field">
+      <label>Status</label>
+      <select id="editStatus">
+        <option value="novo">Novo</option>
+        <option value="contatado">Contatado</option>
+        <option value="proposta">Proposta enviada</option>
+        <option value="convertido">Convertido</option>
+        <option value="descartado">Descartado</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label>Observações</label>
+      <textarea id="editObs" rows="3" placeholder="Anotações sobre este lead..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-gold" onclick="saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allLeads = [];
+let apiBase = localStorage.getItem('apiBase') || '';
+
+// ── CONFIG ──────────────────────────────────────────
+function saveConfig() {
+  apiBase = document.getElementById('apiUrl').value.trim().replace(/\/$/, '');
+  localStorage.setItem('apiBase', apiBase);
+  showToast('URL salva!', 'ok');
+}
+function getApi(path) { return (apiBase || window.location.origin) + path; }
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (apiBase) document.getElementById('apiUrl').value = apiBase;
+});
+
+async function testConnection() {
+  const el = document.getElementById('testResult');
+  el.textContent = 'Testando...';
+  try {
+    const r = await fetch(getApi('/api/status'), { signal: AbortSignal.timeout(5000) });
+    if (r.ok) { el.style.color = 'var(--success)'; el.textContent = '✓ Conectado com sucesso!'; setOnline(true); }
+    else { el.style.color = 'var(--danger)'; el.textContent = `✗ Erro ${r.status}`; setOnline(false); }
+  } catch(e) { el.style.color = 'var(--danger)'; el.textContent = `✗ Não foi possível conectar: ${e.message}`; setOnline(false); }
+}
+
+// ── NAV ─────────────────────────────────────────────
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    const sec = btn.dataset.section;
+    document.getElementById(sec).classList.add('active');
+    if (sec === 'dashboard') loadDashboard();
+    if (sec === 'leads') loadLeads();
+  });
+});
+
+// ── STATUS ───────────────────────────────────────────
+function setOnline(ok) {
+  document.getElementById('statusDot').style.background = ok ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('statusDot').style.boxShadow = ok ? '0 0 6px var(--success)' : '0 0 6px var(--danger)';
+  document.getElementById('statusLabel').textContent = ok ? 'Online' : 'Offline';
+}
+
+// ── DASHBOARD ────────────────────────────────────────
+async function loadDashboard() {
+  try {
+    const r = await fetch(getApi('/api/status'), { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    const s = data.summary;
+    setOnline(true);
+    document.getElementById('statsGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-num">${s.supabase_saved ?? 0}</div><div class="stat-label">Leads salvos</div></div>
+      <div class="stat-card"><div class="stat-num">${s.backup_saved ?? 0}</div><div class="stat-label">Em backup</div></div>
+      <div class="stat-card"><div class="stat-num">${s.ignored ?? 0}</div><div class="stat-label">Ignorados</div></div>
+      <div class="stat-card"><div class="stat-num">${s.not_qualified ?? 0}</div><div class="stat-label">Não qualificados</div></div>
+      <div class="stat-card"><div class="stat-num">${s.errors ?? 0}</div><div class="stat-label">Erros</div></div>
+    `;
+    document.getElementById('reportBox').textContent = data.report || 'Sem dados hoje.';
+  } catch(e) {
+    setOnline(false);
+    document.getElementById('statsGrid').innerHTML = `<div style="color:var(--muted);font-size:13px;padding:12px;">Backend offline — rode: python agente.py --web</div>`;
+    document.getElementById('reportBox').textContent = 'Sem conexão com o backend.';
+  }
+}
+
+// ── LEADS ─────────────────────────────────────────────
+async function loadLeads() {
+  document.getElementById('leadsBody').innerHTML = '<tr class="loading-row"><td colspan="7">Carregando<span class="loading-dots"></span></td></tr>';
+  try {
+    const r = await fetch(getApi('/api/leads'), { signal: AbortSignal.timeout(10000) });
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    allLeads = data.leads || [];
+    populateNichoFilter();
+    renderLeads();
+    setOnline(true);
+  } catch(e) {
+    setOnline(false);
+    document.getElementById('leadsBody').innerHTML = `<tr class="loading-row"><td colspan="7" style="color:var(--danger);">Erro ao carregar leads: ${e.message}</td></tr>`;
+  }
+}
+
+function populateNichoFilter() {
+  const nichos = [...new Set(allLeads.map(l => l.nicho_detectado).filter(Boolean))];
+  const sel = document.getElementById('filterNicho');
+  sel.innerHTML = '<option value="">Todos os nichos</option>' + nichos.map(n => `<option value="${n}">${n}</option>`).join('');
+}
+
+function renderLeads() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const status = document.getElementById('filterStatus').value;
+  const nicho  = document.getElementById('filterNicho').value;
+
+  let filtered = allLeads.filter(l => {
+    const matchSearch = !search || (l.nome||'').toLowerCase().includes(search) || (l.username_instagram||'').toLowerCase().includes(search);
+    const matchStatus = !status || l.status === status;
+    const matchNicho  = !nicho  || l.nicho_detectado === nicho;
+    return matchSearch && matchStatus && matchNicho;
+  });
+
+  if (!filtered.length) {
+    document.getElementById('leadsBody').innerHTML = `<tr><td colspan="7"><div class="empty"><div class="empty-icon">◎</div><div class="empty-text">Nenhum lead encontrado</div></div></td></tr>`;
+    return;
+  }
+
+  document.getElementById('leadsBody').innerHTML = filtered.map(l => {
+    const conf = Math.round((l.confianca_ia || 0) * 100);
+    const date = l.data_criacao ? new Date(l.data_criacao).toLocaleDateString('pt-BR') : '—';
+    const status = l.status || 'novo';
+    return `<tr>
+      <td>
+        <div style="font-weight:500; color:var(--gold); font-size:13px;">@${l.username_instagram||'?'}</div>
+        <div style="font-size:11px; color:var(--muted); margin-top:2px;">${l.nome||''}</div>
+      </td>
+      <td class="td-msg" title="${(l.mensagem||'').replace(/"/g,'&quot;')}">${l.mensagem||'—'}</td>
+      <td>${l.nicho_detectado ? `<span class="nicho-tag">${l.nicho_detectado}</span>` : '—'}</td>
+      <td>
+        <div class="conf-bar">
+          <div class="conf-track"><div class="conf-fill" style="width:${conf}%"></div></div>
+          <span class="conf-num">${conf}%</span>
+        </div>
+      </td>
+      <td style="font-size:12px; color:var(--muted);">${date}</td>
+      <td><span class="badge badge-${status}">${status}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-sm" onclick="openEdit('${l.id}','${status}',\`${(l.observacoes||'').replace(/`/g,"'")}\`)">Editar</button>
+        <button class="btn btn-sm btn-danger" onclick="confirmDelete('${l.id}','@${l.username_instagram}')">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderLeads);
+document.getElementById('filterStatus').addEventListener('change', renderLeads);
+document.getElementById('filterNicho').addEventListener('change', renderLeads);
+document.getElementById('refreshBtn').addEventListener('click', loadLeads);
+
+// ── EDIT MODAL ────────────────────────────────────────
+function openEdit(id, status, obs) {
+  document.getElementById('editLeadId').value = id;
+  document.getElementById('editStatus').value = status;
+  document.getElementById('editObs').value = obs;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+
+async function saveEdit() {
+  const id = document.getElementById('editLeadId').value;
+  const updates = {
+    status: document.getElementById('editStatus').value,
+    observacoes: document.getElementById('editObs').value,
+  };
+  try {
+    const r = await fetch(getApi(`/api/leads/${id}`), {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    if (!r.ok) throw new Error(r.status);
+    closeModal();
+    showToast('Lead atualizado!', 'ok');
+    loadLeads();
+  } catch(e) { showToast(`Erro: ${e.message}`, 'err'); }
+}
+
+// ── DELETE ────────────────────────────────────────────
+function confirmDelete(id, name) {
+  if (!confirm(`Deletar lead ${name}?`)) return;
+  deleteLead(id);
+}
+async function deleteLead(id) {
+  try {
+    const r = await fetch(getApi(`/api/leads/${id}`), { method: 'DELETE' });
+    if (!r.ok) throw new Error(r.status);
+    showToast('Lead removido.', 'ok');
+    loadLeads();
+  } catch(e) { showToast(`Erro ao deletar: ${e.message}`, 'err'); }
+}
+
+// ── CHAT ─────────────────────────────────────────────
+function askSuggestion(el) { document.getElementById('chatInput').value = el.textContent; sendMsg(); }
+
+async function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  addMsg('user', msg);
+  input.value = '';
+  try {
+    const r = await fetch(getApi('/api/chat'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg }),
+    });
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    addMsg('agent', data.response || 'Sem resposta.');
+  } catch(e) { addMsg('agent', `Erro: ${e.message}`); }
+}
+
+function addMsg(role, text) {
+  const wrap = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'msg-user' : 'msg-agent';
+  if (role === 'agent') div.innerHTML = `<div class="msg-label">Agente</div>${text}`;
+  else div.textContent = text;
+  wrap.appendChild(div);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+document.getElementById('sendBtn').addEventListener('click', sendMsg);
+document.getElementById('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+
+// ── TOAST ─────────────────────────────────────────────
+function showToast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>
