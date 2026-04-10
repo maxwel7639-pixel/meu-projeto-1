@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-GEMINI_MODEL = "gemini-1.5-flash"
+GEMINI_MODEL = "gemini-2.0-flash"
 GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 SUPABASE_TABLE = "leads"
 CACHE_FILE = "processed_ids.json"
