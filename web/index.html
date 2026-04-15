@@ -76,9 +76,20 @@ main { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
   padding: 20px;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
 }
 .stat-card:hover { border-color: var(--gold); }
+.stat-card.clickable {
+  cursor: pointer;
+}
+.stat-card.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.15);
+  border-color: var(--gold-light);
+}
+.stat-card.clickable:active {
+  transform: translateY(0);
+}
 .stat-card::before {
   content: '';
   position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -494,12 +505,34 @@ async function loadDashboard() {
     const s = data.summary;
     setOnline(true);
     document.getElementById('statsGrid').innerHTML = `
-      <div class="stat-card"><div class="stat-num">${s.supabase_saved ?? 0}</div><div class="stat-label">Leads salvos</div></div>
-      <div class="stat-card"><div class="stat-num">${s.backup_saved ?? 0}</div><div class="stat-label">Em backup</div></div>
-      <div class="stat-card"><div class="stat-num">${s.ignored ?? 0}</div><div class="stat-label">Ignorados</div></div>
-      <div class="stat-card"><div class="stat-num">${s.not_qualified ?? 0}</div><div class="stat-label">Não qualificados</div></div>
-      <div class="stat-card"><div class="stat-num">${s.errors ?? 0}</div><div class="stat-label">Erros</div></div>
+      <div class="stat-card clickable" id="card-leads"><div class="stat-num">${s.total_leads ?? 0}</div><div class="stat-label">Leads Totais</div></div>
+      <div class="stat-card clickable" id="card-backup"><div class="stat-num">${s.backup_saved ?? 0}</div><div class="stat-label">Backup (Hoje)</div></div>
+      <div class="stat-card clickable" id="card-ignored"><div class="stat-num">${s.ignored ?? 0}</div><div class="stat-label">Ignorados (Hoje)</div></div>
+      <div class="stat-card clickable" id="card-not-qualified"><div class="stat-num">${s.not_qualified ?? 0}</div><div class="stat-label">Nao Qualificados</div></div>
+      <div class="stat-card clickable" id="card-errors"><div class="stat-num">${s.errors ?? 0}</div><div class="stat-label">Erros</div></div>
     `;
+    
+    // Adicionar eventos de clique aos cards
+    document.getElementById('card-leads').onclick = () => {
+      document.querySelector('[data-section="leads"]').click();
+    };
+    
+    document.getElementById('card-backup').onclick = () => {
+      showToast(`${s.backup_saved} leads aguardando sincronizacao com Supabase.`, 'ok');
+    };
+    
+    document.getElementById('card-ignored').onclick = () => {
+      showToast(`${s.ignored} mensagens ignoradas pelo filtro de palavras-chave hoje.`, 'ok');
+    };
+    
+    document.getElementById('card-not-qualified').onclick = () => {
+      showToast(`${s.not_qualified} mensagens nao qualificadas como leads hoje.`, 'ok');
+    };
+    
+    document.getElementById('card-errors').onclick = () => {
+      showToast(`${s.errors} erros registrados nos logs hoje.`, 'err');
+    };
+    
     document.getElementById('reportBox').textContent = data.report || 'Sem dados hoje.';
   } catch(e) {
     setOnline(false);
