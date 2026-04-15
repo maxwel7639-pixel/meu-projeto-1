@@ -483,6 +483,11 @@ def create_web_app() -> Flask:
     def api_status() -> Any:
         summary = parse_log_summary()
         summary["actions"] = list(summary["actions"])
+        
+        # Adicionar contagem total de leads do Supabase para o dashboard
+        leads = get_leads_supabase()
+        summary["total_leads"] = len(leads)
+        
         return jsonify({"summary": summary, "report": format_status_report()})
 
     @app.route("/api/chat", methods=["POST"])
